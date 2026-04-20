@@ -1,0 +1,57 @@
+---
+description: Reads in Server Components; mutations via server actions; Zod validation with typed payloads (no FormData as the action type)
+alwaysApply: true
+---
+
+# Server Components, server actions, and Zod
+
+## Data retrieval
+
+- Load application data from the database (and pass it into the UI tree) in **React Server Components** only.
+- Do not use Client Components or client-side `fetch` to internal routes as the primary way to read app data that belongs in the server-rendered tree.
+
+```tsx
+// ❌ BAD — client component fetching app data for the page
+"use client";
+export function Page() {
+  const [data, setData] = useState(null);
+  useEffect(() => { fetch("/api/items").then(...); }, []);
+}
+
+// ✅ GOOD — async Server Component reads and passes props
+export default async function Page() {
+  const items = await db.select().from(itemsTable);
+  return <List items={items} />;
+}
+```
+
+## Inserts, updates, deletes
+
+- All **database writes** (`insert`, `update`, `delete`) must run inside **`"use server"` server actions**. Do not call Drizzle/`db` from Client Components or use client `fetch` to internal mutation routes as the default pattern when a server action can carry the operation.
+
+## Validation
+
+- Validate all external and user-supplied input with **Zod** (`z.object`, etc.) before use in server actions or persistence.
+- Server action arguments must be validated with a Zod schema and exposed as a **TypeScript type** (e.g. `z.infer<typeof mySchema>`). **Do not** type server action parameters as `FormData` (parse `FormData` inside the action if needed, then validate a plain object with Zod).
+
+```typescript
+// ❌ BAD — FormData as the public contract
+"use server";
+export async function saveItem(formData: FormData) { ... }
+
+// ✅ GOOD — schema + inferred type; validate then mutate
+import { z } from "zod";
+
+const saveItemSchema = z.object({ title: z.string().min(1), id: z.string().uuid() });
+export type SaveItemInput = z.infer<typeof saveItemSchema>;
+
+"use server";
+export async function saveItem(input: SaveItemInput) {
+  const data = saveItemSchema.parse(input);
+  await db.update(items).set({ title: data.title }).where(eq(items.id, data.id));
+}
+```
+
+## Clerk
+
+- Resolve identity on the server (e.g. `auth()` from `@clerk/nextjs/server`) inside Server Components and server actions; combine with ownership checks per `clerk-auth-data-isolation.mdc`.

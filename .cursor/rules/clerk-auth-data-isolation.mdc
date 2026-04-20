@@ -1,0 +1,51 @@
+---
+description: Clerk-only auth; every data path must scope to the signed-in user
+alwaysApply: true
+---
+
+# Clerk authentication and data isolation
+
+**Authentication** for this app is handled exclusively by **Clerk** (`@clerk/nextjs`). Do not add parallel auth systems (custom session cookies, separate JWT stacks, or alternate providers) for primary sign-in and identity.
+
+**Authorization**: users must **only** read and mutate data that belongs to them. Treat any request as untrusted until the server has verified identity and applied ownership checks.
+
+## Identity on the server
+
+- Resolve the current user with Clerk’s server APIs (e.g. `auth()` from `@clerk/nextjs/server`). Use the returned **Clerk user id** (`userId`) as the stable tenant key.
+- **Never** use a client-supplied `userId`, email, or “current user” field from the request body or query string as proof of identity. Only trust values from Clerk after `auth()` / `currentUser()` (or equivalent) on the server.
+
+## Database and Drizzle
+
+- Tables that store per-user data must include a column such as `userId` (or `clerkUserId`) storing the Clerk user id, and queries must **filter by that column** using the server-resolved `userId`.
+- For `select` / `update` / `delete`, combine ownership with primary keys: e.g. `where(and(eq(rows.id, id), eq(rows.userId, userId)))`. Do not select by id alone when the row is user-owned.
+- On `insert`, set `userId` from the authenticated session, not from the client.
+
+## APIs, Server Actions, and routes
+
+- Protected handlers must **return 401/403** (or redirect) when there is no valid session or when a resource is not owned by `userId`.
+- Do not return lists or objects that include other users’ private fields. Avoid exposing internal ids that enable cross-user enumeration when not necessary.
+
+## Examples
+
+```typescript
+// ❌ BAD — trusts client id
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId"); // spoofable
+  return db.select().from(bookings).where(eq(bookings.userId, userId!));
+}
+
+// ✅ GOOD — Clerk user id + ownership
+import { auth } from "@clerk/nextjs/server";
+import { db } from "@/lib/db";
+import { bookings } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
+
+export async function GET() {
+  const { userId } = await auth();
+  if (!userId) return new Response("Unauthorized", { status: 401 });
+  return db.select().from(bookings).where(eq(bookings.userId, userId));
+}
+```
+
+When adding new features, default to **deny**: no access without a verified Clerk `userId` and an explicit ownership check in the same code path that reads or writes the row.

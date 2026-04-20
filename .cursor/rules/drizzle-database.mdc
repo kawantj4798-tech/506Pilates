@@ -1,0 +1,32 @@
+---
+description: Database access must use Drizzle schema and queries only
+alwaysApply: true
+---
+
+# Drizzle ORM
+
+All database access in this project must go through **Drizzle**: schema definitions and query APIs. Do not introduce another ORM or primary SQL layer (e.g. Prisma, Sequelize, Kysely as the main stack, or ad-hoc `pg` / driver queries for application data).
+
+## Schema
+
+- Define and extend tables, columns, and relations in the Drizzle schema (e.g. `lib/db/schema.ts`). Do not maintain a parallel schema in another format.
+- Use `drizzle-orm` / `drizzle-kit` for migrations per the project’s `drizzle.config.ts`.
+
+## Queries
+
+- Use the shared Drizzle `db` instance (e.g. from `lib/db/index.ts`) with Drizzle’s query builder (`select`, `insert`, `update`, `delete`, relational queries, `sql` template tagged for fragments when needed).
+- Avoid raw string-built SQL as the default pattern; prefer typed Drizzle APIs aligned with the schema.
+
+## Examples
+
+```typescript
+// ❌ BAD — raw driver as the app data layer
+import pg from "pg";
+const res = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+
+// ✅ GOOD — Drizzle schema + queries
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+const rows = await db.select().from(users).where(eq(users.id, id));
+```
