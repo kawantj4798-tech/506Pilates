@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  Show,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 
-import { Button } from "@/components/ui/button";
+import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -52,22 +46,11 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-full flex flex-col">
-        <ClerkProvider>
-          <header className="flex items-center justify-end gap-3 p-4">
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <Button variant="outline" size="sm">
-                  Sign in
-                </Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button size="sm">Sign up</Button>
-              </SignUpButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </header>
+        <ClerkProvider
+          signInForceRedirectUrl="/dashboard"
+          signUpForceRedirectUrl="/dashboard"
+        >
+          <SiteHeader />
           {children}
         </ClerkProvider>
       </body>

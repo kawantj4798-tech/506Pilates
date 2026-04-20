@@ -10,8 +10,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
-export function AuthDialogSection() {
+type AuthDialogSectionProps = {
+  className?: string;
+  buttonSize?: React.ComponentProps<typeof Button>["size"];
+};
+
+export function AuthDialogSection({
+  className,
+  buttonSize = "sm",
+}: AuthDialogSectionProps) {
   const [signInOpen, setSignInOpen] = useState(false);
   const [signUpOpen, setSignUpOpen] = useState(false);
   const signInContainerRef = useRef<HTMLDivElement>(null);
@@ -19,11 +28,16 @@ export function AuthDialogSection() {
 
   return (
     <>
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
+      <div
+        className={cn(
+          "flex flex-wrap items-center gap-3",
+          className,
+        )}
+      >
         <Button
           type="button"
-          variant="outline"
-          size="lg"
+          variant="ghost"
+          size={buttonSize}
           onClick={() => {
             setSignUpOpen(false);
             setSignInOpen(true);
@@ -33,7 +47,7 @@ export function AuthDialogSection() {
         </Button>
         <Button
           type="button"
-          size="lg"
+          size={buttonSize}
           onClick={() => {
             setSignInOpen(false);
             setSignUpOpen(true);
@@ -50,8 +64,9 @@ export function AuthDialogSection() {
           </DialogHeader>
           <div ref={signInContainerRef} className="min-h-[min(70vh,420px)]">
             <SignIn
+              routing="hash"
               getContainer={() => signInContainerRef.current}
-              fallbackRedirectUrl="/dashboard"
+              forceRedirectUrl="/dashboard"
               withSignUp
             />
           </div>
@@ -65,8 +80,9 @@ export function AuthDialogSection() {
           </DialogHeader>
           <div ref={signUpContainerRef} className="min-h-[min(70vh,420px)]">
             <SignUp
+              routing="hash"
               getContainer={() => signUpContainerRef.current}
-              fallbackRedirectUrl="/dashboard"
+              forceRedirectUrl="/dashboard"
             />
           </div>
         </DialogContent>

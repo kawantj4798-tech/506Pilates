@@ -1,13 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
+import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { AuthDialogSection } from "@/components/auth-dialog-section";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
 export default async function Home() {
@@ -18,18 +17,27 @@ export default async function Home() {
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-8 text-center">
-      <Card className="w-full max-w-lg border-0 bg-transparent p-0 shadow-none ring-0">
+      <Card className="w-full max-w-5xl border-0 bg-transparent p-0 shadow-none ring-0">
         <CardHeader className="px-0 text-center">
-          <CardTitle className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            506 Pilates Lab
-          </CardTitle>
+          <h1 className="mb-4 w-full">
+            <Link
+              href="/"
+              className="inline-flex w-full justify-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <Image
+                src="/banner.png"
+                alt="506 Pilates Lab"
+                width={1536}
+                height={1024}
+                className="h-auto w-full object-contain"
+                priority
+              />
+            </Link>
+          </h1>
           <CardDescription className="text-base text-muted-foreground sm:text-lg">
             Strength, balance, and breath — right here in the Heights.
           </CardDescription>
         </CardHeader>
-        <CardContent className="px-0 pt-0">
-          <AuthDialogSection />
-        </CardContent>
       </Card>
     </main>
   );
