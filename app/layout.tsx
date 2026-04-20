@@ -7,6 +7,8 @@ import {
   Show,
   UserButton,
 } from "@clerk/nextjs";
+
+import { Button } from "@/components/ui/button";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -53,8 +55,14 @@ export default function RootLayout({
         <ClerkProvider>
           <header className="flex items-center justify-end gap-3 p-4">
             <Show when="signed-out">
-              <SignInButton />
-              <SignUpButton />
+              <SignInButton mode="modal">
+                <Button variant="outline" size="sm">
+                  Sign in
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button size="sm">Sign up</Button>
+              </SignUpButton>
             </Show>
             <Show when="signed-in">
               <UserButton />
