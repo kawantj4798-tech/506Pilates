@@ -13,9 +13,9 @@ export async function SiteHeader() {
   const isAdmin = userId ? await isCurrentUserAdmin() : false;
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 p-4">
+    <header className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3 border-b border-border/40 p-3 md:p-4">
       <nav
-        className="flex flex-wrap items-center gap-1"
+        className="flex min-w-0 flex-wrap items-center gap-1"
         aria-label="Main navigation"
       >
         <SiteLogo variant="header" />
@@ -23,7 +23,7 @@ export async function SiteHeader() {
           href="/classes"
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          Book Class
+          Book Your Session
         </Link>
         {isAdmin ? (
           <Link
@@ -34,7 +34,7 @@ export async function SiteHeader() {
           </Link>
         ) : null}
       </nav>
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-2 md:gap-3">
         {!userId ? <AuthDialogSection /> : null}
         {userId ? <UserButton /> : null}
       </div>

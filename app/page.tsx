@@ -9,8 +9,8 @@ import {
 
 export default async function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-4 py-8 text-center">
-      <Card className="w-full max-w-5xl border-0 bg-transparent p-0 shadow-none ring-0">
+    <main className="flex min-w-0 flex-1 flex-col items-center justify-center px-4 py-6 text-center md:py-8">
+      <Card className="w-full min-w-0 max-w-5xl border-0 bg-transparent p-0 shadow-none ring-0">
         <CardHeader className="px-0 text-center">
           <h1 className="mb-4 w-full">
             <Link
@@ -22,7 +22,8 @@ export default async function Home() {
                 alt="506 Pilates Lab"
                 width={1536}
                 height={1024}
-                className="h-auto w-full object-contain"
+                className="h-auto max-w-full object-contain"
+                sizes="(max-width: 1024px) 100vw, 1024px"
                 priority
               />
             </Link>

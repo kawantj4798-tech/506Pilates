@@ -1,0 +1,43 @@
+---
+description: Responsive layouts and touch-friendly UI across screen sizes (Tailwind + shadcn)
+globs: app/**/*.tsx,components/**/*.tsx
+alwaysApply: false
+---
+
+# Responsive UI (all viewports)
+
+When building or changing pages and UI, **every layout must work from narrow phones (~320px) through large desktops**, without horizontal scroll (except intentional patterns like data tables).
+
+## Layout and width
+
+- Prefer **fluid width**: `w-full`, `max-w-*`, `min-w-0` on flex/grid children. Avoid fixed `w-[…px]` that clips content on small screens unless paired with responsive overrides.
+- Use **responsive direction and gaps**: e.g. `flex flex-col gap-4 md:flex-row md:items-center md:gap-6`; stack on small screens, row when space allows.
+- **Grids**: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` (or similar) instead of a single column count for all breakpoints.
+- Long content: allow **wrapping** (`break-words`, sensible `whitespace`) and **scroll only where intended** (`overflow-x-auto` for wide tables, not the whole page).
+
+## Typography and spacing
+
+- Scale type and spacing with breakpoints: e.g. `text-sm md:text-base`, `p-4 md:p-6 lg:p-8`, `gap-3 md:gap-4`.
+- Headings should remain readable and not overflow; adjust `text-*` and `leading-*` per breakpoint if needed.
+
+## Media and embeds
+
+- Images: `max-w-full h-auto`, and use Next.js `Image` with appropriate `sizes` when using `fill` or responsive layouts.
+- Video/iframes: constrain with `max-w-full` and preserve aspect ratio.
+
+## Interactive elements
+
+- **Touch targets**: primary actions should be easy to tap (roughly **44×44px** minimum hit area); use padding on `Button`/`Link` or wrap with adequate spacing—don’t rely on tiny icons alone without a larger tap zone.
+- **shadcn `Dialog` / `Sheet`**: ensure content **scrolls inside** the overlay on short viewports (`max-h`, scrollable body) so primary actions stay reachable.
+
+## Verification mindset
+
+Before considering a screen done, sanity-check **320px**, **768px**, and **1280px** width: no accidental overflow, no unusable overlaps, and primary tasks remain visible without zooming.
+
+```tsx
+// ❌ BAD — fixed width breaks small screens
+<div className="w-[800px]">...</div>
+
+// ✅ GOOD — fluid + breakpoint behavior
+<div className="w-full min-w-0 max-w-4xl mx-auto px-4 md:px-6">...</div>
+```

@@ -45,7 +45,7 @@ export default async function DashboardPage() {
 
   if (!userId) {
     return (
-      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-8">
+      <main className="mx-auto flex min-w-0 w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:py-8">
         <Card>
           <CardHeader className="items-center text-center">
             <CardTitle>Welcome to your dashboard</CardTitle>
@@ -68,7 +68,7 @@ export default async function DashboardPage() {
 
   if (!user) {
     return (
-      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-8">
+      <main className="mx-auto flex min-w-0 w-full max-w-lg flex-1 flex-col gap-6 px-4 py-6 md:py-8">
         <Card>
           <CardHeader className="items-center text-center">
             <CardTitle>Unable to load account details</CardTitle>
@@ -190,11 +190,11 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8">
-      <Card>
+    <main className="mx-auto flex min-w-0 w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-6 md:gap-6 md:py-8">
+      <Card className="min-w-0">
         <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <CardTitle className="font-heading text-3xl font-semibold tracking-tight">
+          <div className="min-w-0 space-y-1">
+            <CardTitle className="font-heading text-2xl font-semibold tracking-tight break-words md:text-3xl">
               Welcome back, {displayName}
             </CardTitle>
             <CardDescription>
@@ -207,7 +207,7 @@ export default async function DashboardPage() {
               href="/classes"
               className={cn(buttonVariants({ variant: "default", size: "sm" }))}
             >
-              Book session
+              Book Your Session
             </Link>
             <Link
               href={nextBooking ? `/scheduler/${nextBooking.classId}` : "/classes"}
@@ -227,8 +227,8 @@ export default async function DashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="grid min-w-0 gap-4 md:gap-6 lg:grid-cols-3">
+        <Card className="min-w-0 lg:col-span-2">
           <CardHeader>
             <CardTitle>Upcoming session</CardTitle>
             <CardDescription>
@@ -245,13 +245,15 @@ export default async function DashboardPage() {
                   href="/classes"
                   className={cn(buttonVariants({ variant: "default", size: "sm" }))}
                 >
-                  Book your first class
+                  Book your first session
                 </Link>
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="space-y-1">
-                  <p className="text-base font-medium">{nextBooking.classTitle}</p>
+                <div className="min-w-0 space-y-1">
+                  <p className="break-words text-base font-medium">
+                    {nextBooking.classTitle}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     {formatInTimeZone(
                       nextBooking.startsAt,
@@ -288,7 +290,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Session summary</CardTitle>
             <CardDescription>
@@ -304,8 +306,9 @@ export default async function DashboardPage() {
               Confirmed sessions booked:{" "}
               <span className="text-muted-foreground">{confirmedBookingsTotal}</span>
             </p>
-            <p className="font-medium">
-              Account email: <span className="text-muted-foreground">{userEmail}</span>
+            <p className="min-w-0 break-words font-medium">
+              Account email:{" "}
+              <span className="text-muted-foreground">{userEmail}</span>
             </p>
             <p className="font-medium">
               Studio timezone:{" "}
@@ -315,8 +318,8 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="grid min-w-0 gap-4 md:gap-6 lg:grid-cols-3">
+        <Card className="min-w-0 lg:col-span-2">
           <CardHeader>
             <CardTitle>My bookings</CardTitle>
             <CardDescription>
@@ -341,8 +344,10 @@ export default async function DashboardPage() {
                         key={booking.id}
                         className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
                       >
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium">{booking.classTitle}</p>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <p className="break-words text-sm font-medium">
+                            {booking.classTitle}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {formatInTimeZone(
                               booking.startsAt,
@@ -351,7 +356,7 @@ export default async function DashboardPage() {
                             )}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex shrink-0 items-center gap-2">
                           <Badge variant="default">
                             {formatBookingStatus(booking.status)}
                           </Badge>
@@ -381,8 +386,10 @@ export default async function DashboardPage() {
                         key={booking.id}
                         className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
                       >
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium">{booking.classTitle}</p>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <p className="break-words text-sm font-medium">
+                            {booking.classTitle}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {formatInTimeZone(
                               booking.startsAt,
@@ -392,6 +399,7 @@ export default async function DashboardPage() {
                           </p>
                         </div>
                         <Badge
+                          className="shrink-0"
                           variant={
                             booking.status === "cancelled" ? "secondary" : "outline"
                           }
@@ -407,7 +415,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Studio updates</CardTitle>
             <CardDescription>Latest notes and announcements.</CardDescription>
@@ -421,8 +429,8 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="grid min-w-0 gap-4 md:gap-6 lg:grid-cols-3">
+        <Card className="min-w-0 lg:col-span-2">
           <CardHeader>
             <CardTitle>Available time slots</CardTitle>
             <CardDescription>
@@ -441,8 +449,8 @@ export default async function DashboardPage() {
                     key={`${slot.classId}-${slot.firstSlot!.startsAt.toISOString()}`}
                     className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
                   >
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">{slot.title}</p>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <p className="break-words text-sm font-medium">{slot.title}</p>
                       <p className="text-xs text-muted-foreground">
                         {formatInTimeZone(
                           slot.firstSlot!.startsAt,
@@ -453,7 +461,10 @@ export default async function DashboardPage() {
                     </div>
                     <Link
                       href={`/scheduler/${slot.classId}`}
-                      className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                      className={cn(
+                        buttonVariants({ variant: "outline", size: "sm" }),
+                        "shrink-0"
+                      )}
                     >
                       Book
                     </Link>
@@ -464,7 +475,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Profile & preferences</CardTitle>
             <CardDescription>
@@ -478,7 +489,7 @@ export default async function DashboardPage() {
                 {user.fullName ?? "Not set"}
               </span>
             </p>
-            <p className="font-medium">
+            <p className="min-w-0 break-words font-medium">
               Email: <span className="text-muted-foreground">{userEmail}</span>
             </p>
             <p className="font-medium">

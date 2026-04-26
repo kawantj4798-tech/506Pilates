@@ -156,10 +156,10 @@ export default async function AdminSchedulePage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-heading text-3xl">
+    <main className="mx-auto flex min-w-0 w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-6 md:gap-6 md:py-8">
+      <Card className="min-w-0">
+        <CardHeader className="min-w-0">
+          <CardTitle className="font-heading text-2xl md:text-3xl">
             Admin Scheduling
           </CardTitle>
           <CardDescription>
@@ -170,7 +170,7 @@ export default async function AdminSchedulePage() {
         </CardHeader>
       </Card>
 
-      <Card>
+      <Card className="min-w-0">
         <CardHeader>
           <CardTitle>Add availability</CardTitle>
           <CardDescription>
@@ -234,7 +234,7 @@ export default async function AdminSchedulePage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="min-w-0">
         <CardHeader>
           <CardTitle>Upcoming availability</CardTitle>
           <CardDescription>
@@ -243,7 +243,7 @@ export default async function AdminSchedulePage() {
             until you cancel them below.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="min-w-0">
           {windowRows.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No upcoming availability yet.
@@ -265,14 +265,14 @@ export default async function AdminSchedulePage() {
                     bookingCountByWindowId.get(row.id) ?? 0;
                   return (
                     <TableRow key={row.id}>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {formatInTimeZone(
                           row.startsAt,
                           studioTimeZone,
                           "EEE, MMM d yyyy"
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="min-w-[12rem] whitespace-nowrap">
                         {formatInTimeZone(
                           row.startsAt,
                           studioTimeZone,
@@ -292,10 +292,15 @@ export default async function AdminSchedulePage() {
                           {bookedCount}
                         </Badge>
                       </TableCell>
-                      <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
-                        {row.notes ?? "—"}
+                      <TableCell className="max-w-[10rem] text-sm text-muted-foreground md:max-w-xs">
+                        <span
+                          className="block truncate"
+                          title={row.notes ?? undefined}
+                        >
+                          {row.notes ?? "—"}
+                        </span>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right whitespace-nowrap">
                         <form
                           action={deleteWindowFromForm}
                           className="inline-flex"
@@ -319,12 +324,12 @@ export default async function AdminSchedulePage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="min-w-0">
         <CardHeader>
           <CardTitle>Upcoming bookings</CardTitle>
           <CardDescription>Confirmed 1-1 sessions clients have booked.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="min-w-0">
           {bookingRows.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No upcoming bookings yet.
@@ -344,20 +349,22 @@ export default async function AdminSchedulePage() {
                   const user = usersById.get(row.userId);
                   return (
                     <TableRow key={row.id}>
-                      <TableCell>
+                      <TableCell className="max-w-[10rem] break-words md:max-w-[14rem]">
                         {user
                           ? formatBookingClient(user)
                           : `Client (${row.userId.slice(-6)})`}
                       </TableCell>
-                      <TableCell>{row.classTitle}</TableCell>
-                      <TableCell>
+                      <TableCell className="break-words">
+                        {row.classTitle}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {formatInTimeZone(
                           row.startsAt,
                           studioTimeZone,
                           "EEE, MMM d yyyy h:mm a"
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {formatInTimeZone(
                           row.endsAt,
                           studioTimeZone,

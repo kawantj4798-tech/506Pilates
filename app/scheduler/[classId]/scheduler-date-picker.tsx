@@ -68,7 +68,10 @@ export function SchedulerDatePicker({
         <CalendarIcon className="mr-2 size-4 shrink-0" />
         {label}
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto max-w-[min(20rem,calc(100vw-2rem))] p-0"
+        align="start"
+      >
         <Calendar
           mode="single"
           timeZone={studioTimeZone}

@@ -27,14 +27,14 @@ export default function RootLayout({
       className={`${manrope.variable} h-full font-sans antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full min-w-0 flex-col">
         <ThemeSync />
         <ClerkProvider
           signInForceRedirectUrl="/dashboard"
           signUpForceRedirectUrl="/dashboard"
         >
           <SiteHeader />
-          {children}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
         </ClerkProvider>
       </body>
     </html>

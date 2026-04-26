@@ -183,11 +183,11 @@ export default async function AdminDashboardPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8">
-      <Card>
+    <main className="mx-auto flex min-w-0 w-full max-w-6xl flex-1 flex-col gap-4 px-4 py-6 md:gap-6 md:py-8">
+      <Card className="min-w-0">
         <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <CardTitle className="font-heading text-3xl font-semibold tracking-tight">
+          <div className="min-w-0 space-y-1">
+            <CardTitle className="font-heading text-2xl font-semibold tracking-tight break-words md:text-3xl">
               Admin Dashboard
             </CardTitle>
             <CardDescription>
@@ -212,8 +212,8 @@ export default async function AdminDashboardPage() {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      <div className="grid min-w-0 gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-4">
+        <Card className="min-w-0">
           <CardHeader className="pb-2">
             <CardDescription>Upcoming confirmed sessions</CardDescription>
             <CardTitle className="text-2xl">{upcomingConfirmedRows[0]?.value ?? 0}</CardTitle>
@@ -222,7 +222,7 @@ export default async function AdminDashboardPage() {
             <p className="text-xs text-muted-foreground">Scheduled from now onward.</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="pb-2">
             <CardDescription>Cancellations (last 7 days)</CardDescription>
             <CardTitle className="text-2xl">{cancellationRows[0]?.value ?? 0}</CardTitle>
@@ -233,7 +233,7 @@ export default async function AdminDashboardPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="pb-2">
             <CardDescription>Active availability windows</CardDescription>
             <CardTitle className="text-2xl">{upcomingWindowsRows[0]?.value ?? 0}</CardTitle>
@@ -242,7 +242,7 @@ export default async function AdminDashboardPage() {
             <p className="text-xs text-muted-foreground">Windows ending in the future.</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="pb-2">
             <CardDescription>Utilization snapshot</CardDescription>
             <CardTitle className="text-2xl">{utilizationPercent}%</CardTitle>
@@ -255,13 +255,13 @@ export default async function AdminDashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="grid min-w-0 gap-4 md:gap-6 lg:grid-cols-3">
+        <Card className="min-w-0 lg:col-span-2">
           <CardHeader>
             <CardTitle>Recent bookings</CardTitle>
             <CardDescription>Latest client booking activity.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="min-w-0">
             {recentBookingsRows.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 No bookings are available yet.
@@ -281,11 +281,11 @@ export default async function AdminDashboardPage() {
                     const user = usersById.get(row.userId);
                     return (
                       <TableRow key={row.id}>
-                        <TableCell>
+                        <TableCell className="max-w-[10rem] break-words md:max-w-[14rem]">
                           {user ? formatBookingClient(user) : `Client (${row.userId.slice(-6)})`}
                         </TableCell>
-                        <TableCell>{row.classTitle}</TableCell>
-                        <TableCell>
+                        <TableCell className="break-words">{row.classTitle}</TableCell>
+                        <TableCell className="whitespace-nowrap">
                           {formatInTimeZone(
                             row.startsAt,
                             studioTimeZone,
@@ -308,7 +308,7 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Top class demand</CardTitle>
             <CardDescription>
@@ -325,10 +325,14 @@ export default async function AdminDashboardPage() {
                 {topClassDemandRows.map((row) => (
                   <li
                     key={row.classTypeId}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3"
                   >
-                    <span className="text-sm font-medium">{row.classTitle}</span>
-                    <Badge variant="outline">{row.bookingsCount}</Badge>
+                    <span className="min-w-0 flex-1 break-words text-sm font-medium">
+                      {row.classTitle}
+                    </span>
+                    <Badge className="shrink-0" variant="outline">
+                      {row.bookingsCount}
+                    </Badge>
                   </li>
                 ))}
               </ul>

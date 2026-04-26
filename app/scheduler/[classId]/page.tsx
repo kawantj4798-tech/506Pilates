@@ -166,21 +166,21 @@ export default async function SchedulerPage({
   const isSignedIn = Boolean(userId);
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-heading text-2xl sm:text-3xl">
+    <main className="mx-auto flex min-w-0 w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-6 md:gap-8 md:py-8">
+      <Card className="min-w-0">
+        <CardHeader className="min-w-0">
+          <CardTitle className="font-heading text-2xl break-words sm:text-3xl">
             {c.title}
           </CardTitle>
-          <CardDescription className="text-base">
+          <CardDescription className="break-words text-sm md:text-base">
             {c.durationMinutes} minutes · {formatPrice(c.price)}
             {c.instructorName ? ` · ${c.instructorName}` : ""}
           </CardDescription>
         </CardHeader>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card className="min-w-0">
+        <CardHeader className="min-w-0">
           <CardTitle>Schedule</CardTitle>
           <CardDescription>
             {slots.length === 0
@@ -235,15 +235,17 @@ export default async function SchedulerPage({
                       key={slot.startsAt.toISOString()}
                       className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2"
                     >
-                      <span className="text-sm font-medium tabular-nums">
+                      <span className="min-w-0 break-words text-sm font-medium tabular-nums">
                         {slotLabel}
                       </span>
-                      <BookSlotButton
-                        classId={classId}
-                        startsAtIso={slot.startsAt.toISOString()}
-                        isSignedIn={isSignedIn}
-                        slotLabel={slotLabel}
-                      />
+                      <div className="shrink-0">
+                        <BookSlotButton
+                          classId={classId}
+                          startsAtIso={slot.startsAt.toISOString()}
+                          isSignedIn={isSignedIn}
+                          slotLabel={slotLabel}
+                        />
+                      </div>
                     </li>
                   );
                 })}
