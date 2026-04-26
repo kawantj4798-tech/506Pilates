@@ -1,7 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import {
   Card,
@@ -10,11 +8,6 @@ import {
 } from "@/components/ui/card";
 
 export default async function Home() {
-  const { userId } = await auth();
-  if (userId) {
-    redirect("/dashboard");
-  }
-
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-8 text-center">
       <Card className="w-full max-w-5xl border-0 bg-transparent p-0 shadow-none ring-0">
