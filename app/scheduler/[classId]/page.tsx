@@ -4,7 +4,8 @@ import { Suspense } from "react";
 import { z } from "zod";
 import { formatInTimeZone, toDate } from "date-fns-tz";
 import { addDays } from "date-fns";
-import { and, asc, eq, gte, lt } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,10 +16,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { db } from "@/lib/db";
-import { classTypes, classes, scheduledClasses } from "@/lib/db/schema";
+import { classTypes, classes } from "@/lib/db/schema";
 import { getStudioTimeZone } from "@/lib/studio-timezone";
+import { getAvailableSlotsForClass } from "@/lib/scheduling/slots";
 import { CalendarIcon } from "lucide-react";
 
+import { BookSlotButton } from "./book-slot-button";
 import { SchedulerDatePicker } from "./scheduler-date-picker";
 
 const schedulerParamsSchema = z.object({
@@ -131,27 +134,12 @@ export default async function SchedulerPage({
   const windowEnd = addDays(now, 90);
   const todayYmd = formatInTimeZone(now, studioTz, "yyyy-MM-dd");
 
-  const upcomingRows = await db
-    .select({
-      id: scheduledClasses.id,
-      startsAt: scheduledClasses.startsAt,
-      capacity: scheduledClasses.capacity,
-    })
-    .from(scheduledClasses)
-    .where(
-      and(
-        eq(scheduledClasses.classId, classId),
-        gte(scheduledClasses.startsAt, now),
-        lt(scheduledClasses.startsAt, windowEnd)
-      )
-    )
-    .orderBy(asc(scheduledClasses.startsAt));
+  const slotResult = await getAvailableSlotsForClass(classId, now, windowEnd);
+  const slots = slotResult?.slots ?? [];
 
   const availableDatesYmd = [
     ...new Set(
-      upcomingRows.map((r) =>
-        formatInTimeZone(r.startsAt, studioTz, "yyyy-MM-dd")
-      )
+      slots.map((s) => formatInTimeZone(s.startsAt, studioTz, "yyyy-MM-dd"))
     ),
   ].sort();
 
@@ -169,9 +157,13 @@ export default async function SchedulerPage({
     selectedYmd = firstUpcomingYmd ?? todayYmd;
   }
 
-  const sessionsThisDay = upcomingRows.filter(
-    (r) => formatInTimeZone(r.startsAt, studioTz, "yyyy-MM-dd") === selectedYmd
+  const slotsThisDay = slots.filter(
+    (s) =>
+      formatInTimeZone(s.startsAt, studioTz, "yyyy-MM-dd") === selectedYmd
   );
+
+  const { userId } = await auth();
+  const isSignedIn = Boolean(userId);
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-8">
@@ -191,9 +183,9 @@ export default async function SchedulerPage({
         <CardHeader>
           <CardTitle>Schedule</CardTitle>
           <CardDescription>
-            {upcomingRows.length === 0
-              ? "No sessions are scheduled in the next 90 days."
-              : "Choose a date with an available session, then pick a time."}
+            {slots.length === 0
+              ? "No slots are available in the next 90 days."
+              : "Choose a date with availability, then pick a time."}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
@@ -226,33 +218,35 @@ export default async function SchedulerPage({
                 "EEEE, MMM d, yyyy"
               )}
             </p>
-            {sessionsThisDay.length === 0 ? (
+            {slotsThisDay.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No sessions on this date. Try another day with availability.
+                No openings on this date. Try another day with availability.
               </p>
             ) : (
               <ul className="flex flex-col gap-2">
-                {sessionsThisDay.map((s) => (
-                  <li
-                    key={s.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2"
-                  >
-                    <span className="text-sm font-medium tabular-nums">
-                      {formatInTimeZone(
-                        s.startsAt,
-                        studioTz,
-                        "h:mm a zzz"
-                      )}
-                    </span>
-                    <span className="text-muted-foreground text-xs">
-                      {s.capacity}{" "}
-                      {s.capacity === 1 ? "spot" : "spots"}
-                    </span>
-                    <Button type="button" variant="secondary" size="sm" disabled>
-                      Book soon
-                    </Button>
-                  </li>
-                ))}
+                {slotsThisDay.map((slot) => {
+                  const slotLabel = formatInTimeZone(
+                    slot.startsAt,
+                    studioTz,
+                    "h:mm a zzz"
+                  );
+                  return (
+                    <li
+                      key={slot.startsAt.toISOString()}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2"
+                    >
+                      <span className="text-sm font-medium tabular-nums">
+                        {slotLabel}
+                      </span>
+                      <BookSlotButton
+                        classId={classId}
+                        startsAtIso={slot.startsAt.toISOString()}
+                        isSignedIn={isSignedIn}
+                        slotLabel={slotLabel}
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>

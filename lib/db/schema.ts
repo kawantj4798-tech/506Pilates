@@ -1,7 +1,9 @@
 import {
   boolean,
+  index,
   integer,
   numeric,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -34,7 +36,7 @@ export const classTypes = pgTable("class_types", {
 
 /**
  * A concrete offering tied to a class type (instructor, active series).
- * Scheduled sessions reference this row.
+ * Bookings reference this row.
  */
 export const classes = pgTable("classes", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -45,12 +47,53 @@ export const classes = pgTable("classes", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
-/** Bookable session on the calendar (date/time in UTC; display with a timezone in the app). */
-export const scheduledClasses = pgTable("scheduled_classes", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  classId: integer("class_id")
-    .notNull()
-    .references(() => classes.id, { onDelete: "cascade" }),
-  startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
-  capacity: integer().notNull().default(1),
-});
+/**
+ * Admin-published availability blocks (e.g. "Apr 28, 9:00am-12:00pm").
+ * The scheduler slices each window into back-to-back slots based on the
+ * class type's duration and excludes any that overlap a confirmed booking.
+ */
+export const availabilityWindows = pgTable(
+  "availability_windows",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    notes: text(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("availability_windows_starts_at_idx").on(table.startsAt),
+  ]
+);
+
+export const bookingStatusEnum = pgEnum("booking_status", [
+  "confirmed",
+  "cancelled",
+]);
+
+/**
+ * A user's reservation of a 1-1 slot. Ownership is tracked via the Clerk
+ * `userId`; queries that read or mutate a booking must filter by it.
+ */
+export const bookings = pgTable(
+  "bookings",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    classId: integer("class_id")
+      .notNull()
+      .references(() => classes.id, { onDelete: "cascade" }),
+    userId: varchar("user_id", { length: 255 }).notNull(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    status: bookingStatusEnum().notNull().default("confirmed"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("bookings_user_id_idx").on(table.userId),
+    index("bookings_starts_at_idx").on(table.startsAt),
+  ]
+);
